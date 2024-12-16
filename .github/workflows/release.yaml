@@ -1,0 +1,35 @@
+name: Release Charts
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get Updated helm version
+        run: |
+          set -x
+          CURRENT_HELM_VERSION=$(cat Chart.yaml | yq .version)
+          echo CURRENT_HELM_VERSION=$CURRENT_HELM_VERSION
+          IFS=. read -r v1 v2 v3 <<< "${CURRENT_HELM_VERSION}"
+          echo v1=$v1 v2=$v2 v3=$v3
+          v2=$((v2 + 1))
+          NEW_HELM_VERSION="${v1}.${v2}.${v3}"
+          echo NEW_HELM_VERSION=$NEW_HELM_VERSION
+          echo "NEW_HELM_VERSION=`echo ${NEW_HELM_VERSION}`" >> $GITHUB_ENV
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.6.0
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          HELM_VERSION: ${{ env.NEW_HELM_VERSION }}

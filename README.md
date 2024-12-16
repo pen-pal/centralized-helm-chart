@@ -1,2 +1,1 @@
-# centralized-helm-chart
-Centralized Helm Chart
+# helm-charts

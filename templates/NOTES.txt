@@ -1,0 +1,11 @@
+======
+appname: {{ include "application.name" . }}
+env: {{.Values.namespace }}
+namespace: {{ .Values.namespace }}
+
+image: {{ .Values.image.repository}}
+tag: {{.Values.image.tag }}
+
+{{- if .Values.nodeSelector }}
+nodegroup: {{ .Values.nodeSelector }}
+{{- end }}

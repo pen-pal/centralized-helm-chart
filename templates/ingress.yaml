@@ -1,0 +1,44 @@
+{{- if .Values.ingress.enabled }}
+{{ $app := include "application.fullname" . }}
+{{ $ingressPaths := .Values.ingress.path }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    {{ include "common.labels" . | nindent 4 }}
+  name: {{ .Values.app.name }}
+  annotations:
+    {{ include "ingress.annotations" . | nindent 4}}
+spec:
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+    {{- if .Values.ingress.tls.hosts }}
+    {{- range $host := .Values.ingress.tls.hosts }}
+    - hosts:
+        - {{ $host }}
+      secretName: "{{ $host }}-tls"
+    {{- end -}}
+    {{- end -}}
+  {{- end }}
+
+  rules:
+    {{- range .Values.ingress.hosts | default (list (dict "host" (include "application.domain" .) "paths" (default (list (dict "path" "/*" "port" "http")) .Values.ingress.paths))) }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- $defaultPaths := list (dict "path" "/*" "pathType" "ImplementationSpecific") }}
+          {{- range $p := (default $defaultPaths .paths) }}
+          - path: {{ $p.path | quote }}
+            pathType: {{ default "ImplementationSpecific" $p.pathType | quote }}
+            backend:
+              service:
+                name: {{ $app }}
+                port:
+                {{ if kindIs "string" (default "http" .port) }}
+                  name: {{ default "http" .port }}
+                  {{ else }}
+                  number: {{ default 80 .port }}
+                {{- end -}}
+          {{- end -}}
+    {{- end -}}
+{{- end }}

@@ -1,0 +1,119 @@
+nameapiceOverride: ""
+podAnnotations: []
+environment: production
+kind:
+  deployment: true
+  statefulset: false
+  daemonset: false
+  cronjob: false
+configReloader:
+  enabled: true
+app:
+  name: test-app
+  nameOverride: test-app
+  fullnameOverride: test-app
+image:
+  repository: "123213123.dkr.ecr.eu-west-2.amazonaws.com/test-app"
+  tag: 41d
+  subgroup: ""
+  pullPolicy: "Always"
+  pullSecrets: ""
+containerPort:
+  http: 1337
+service:
+  enabled: true
+  protocol: TCP
+  type: ClusterIP
+external-secrets:
+  enabled: true
+  secretStore:
+    name: cluster-secret-store
+    kind: ClusterSecretStore
+    refreshInterval: "10s"
+secrets:
+  enabled: true
+  secretStore:
+    name: cluster-secret-store
+    kind: ClusterSecretStore
+    refreshInterval: "10s"
+envFromSecret:
+  enabled: true #false #true
+  secretNames:
+    - env
+envFromFile:
+  enabled: false
+extraEnv:
+  enabled: false #true
+nodeSelector: {}
+affinity: {}
+tolerations: {}
+securityContext: #{}
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+containerSecurityContext: {}
+ingress:
+  enabled: false
+  annotations: {}
+  #annotations:
+  #  cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: test.manishkhadka.info.np
+      paths:
+        - path: /
+        - path: /.well-known/acme-challenge
+  tls:
+    enabled: true
+    hosts:
+      - test.manishkhadka.info.np
+scaling:
+  enabled: false
+  replicas:
+    min: 1
+    max: 5
+  type:
+    resource:
+      memory: 50
+      cpu: 50
+resource: {}
+  #value:
+  #limits:
+  #  memory: 4Gi
+  #  cpu: 4
+  #requests:
+  #  memory: 250Mi
+  #  cpu: 250m
+update:
+  type: RollingUpdate
+  minReadySeconds: 10
+  timeoutSeconds: 120
+  maxSurge: "50%"
+  maxUnavailable: "0%"
+podDisruptionBudget:
+  enabled: false
+serviceAccount:
+  enabled: true
+  annotations: {}
+  roleArn: ""
+securityContext: #{}
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  #runAsUser: 1000
+  #runAsGroup: 1000
+  #fsGroup: 1000
+containerSecurityContext: {}
+#readOnlyRootFilesystem: true
+#runAsNonRoot: true
+#unAsUser: 1000
+#unAsGroup: 1000
+#sGroup: 1000
+#llowPrivilegeEscalation: false
+# capabilities:
+#   drop:
+#   - ALL
+# seccompProfile:
+#   type: RuntimeDefault
+container:
+  command: ""
+kubeProbe:
+  enabled: false
+replicas: 0
